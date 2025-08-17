@@ -23,21 +23,21 @@ jobs:
       - name: Fetch, merge, and sort news
         run: |
           mkdir -p _data
-          # Stap 1: Haal nieuwe artikelen op en zorg dat het resultaat altijd een array is
-          curl "https://newsdata.io/api/1/news?apikey=${{ secrets.NEWSDATA_API_KEY }}&q=Mark%20Eijbaard&language=nl" | jq '.results // []' > new_articles.json
+          # Stap 1: Haal nieuwe artikelen op. Pakt alleen .results als het een array is, anders wordt het een lege array [].
+          curl "https://newsdata.io/api/1/news?apikey=${{ secrets.NEWSDATA_API_KEY }}&q=Mark%20Eijbaard&language=nl" | jq 'if (.results | type) == "array" then .results else [] end' > new_articles.json
 
-          # Stap 2: Controleer of er daadwerkelijk nieuwe artikelen zijn (meer dan 0)
-          if jq -e '. | length > 0' new_articles.json > /dev/null; then
+          # Stap 2: Controleer of de (nu veilige) lijst met nieuwe artikelen items bevat.
+          if jq -e 'length > 0' new_articles.json > /dev/null; then
             echo "Nieuwe artikelen gevonden. Bezig met samenvoegen."
-            # Stap 3a: Als er al een nieuwsbestand bestaat, voeg ze samen
+            # Stap 3a: Als er al een nieuwsbestand bestaat, voeg ze samen en behoud de geneste structuur [[...]]
             if [ -f "_data/news.json" ]; then
-              jq -s '.[0][0] + .[1] | unique_by(.link) | sort_by(.pubDate) | reverse' _data/news.json new_articles.json > temp_news.json && mv temp_news.json _data/news.json
-            # Stap 3b: Anders, gebruik alleen de nieuwe artikelen
+              jq -s '[ (.[0][0] + .[1] | unique_by(.link) | sort_by(.pubDate) | reverse) ]' _data/news.json new_articles.json > temp_news.json && mv temp_news.json _data/news.json
+            # Stap 3b: Anders, maak een nieuw bestand aan met de juiste geneste structuur [[...]]
             else
-              jq 'sort_by(.pubDate) | reverse' new_articles.json > _data/news.json
+              jq '[ . | sort_by(.pubDate) | reverse ]' new_articles.json > _data/news.json
             fi
           else
-            echo "Geen nieuwe artikelen gevonden. Er worden geen wijzigingen gemaakt."
+            echo "Geen nieuwe artikelen gevonden of API gaf een fout. Er worden geen wijzigingen gemaakt."
           fi
       
       - name: Commit and push if there are changes
