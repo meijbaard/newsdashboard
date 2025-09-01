@@ -1,73 +1,32 @@
----
-layout: default
-title: "[HIER JE NAAM] in het nieuws"
----
-
+<!doctype html>
 <html lang="nl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="/assets/css/newsdashboard.css" />
+    <title>[HIER JE NAAM] in het nieuws</title>
+    <link rel="stylesheet" href="assets/css/newsdashboard.css" />
 </head>
 <body>
 
     <div class="content-wrapper">
     
-      <h1>{{ page.title }}</h1>
+      <h1>[HIER JE NAAM] in het nieuws</h1>
     
       <div class="news-controls">
         <p id="article-counter">Artikelen aan het laden...</p>
-        <div>
+        <div id="filter-container">
           <strong>Filter op bron:</strong><br>
           <button class="filter-btn active" data-source="all">Alles tonen</button>
-          
-          {%- assign sources = "" | split: "," -%}
-          {%- for item in site.data.news[0] -%}
-            {%- unless sources contains item.source_id -%}
-              {%- assign sources = sources | push: item.source_id -%}
-            {%- endunless -%}
-          {%- endfor -%}
-          
-          {%- for source in sources -%}
-            <button class="filter-btn" data-source="{{ source | cgi_escape }}">{{ source }}</button>
-          {%- endfor -%}
         </div>
       </div>
     
       <div id="nieuws-dashboard">
-        {%- if site.data.news[0] and site.data.news[0].size > 0 -%}
-          <ul id="news-list">
-            {%- for item in site.data.news[0] -%}
-              <li class="news-item" data-pubdate="{{ item.pubDate }}" data-source="{{ item.source_id | cgi_escape }}">
-                
-                {%- if item.image_url and item.image_url != "" -%}
-                  <img src="{{ item.image_url }}" alt="Beeld bij artikel: {{ item.title }}" class="news-image">
-                {%- endif -%}
-    
-                <div class="news-content">
-                  <h3><a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>
-                  <p>
-                    <strong>Bron:</strong> {{ item.source_id }} 
-                    {%- if item.creator and item.creator.size > 0 and item.creator[0] != "" and item.creator[0] != "Onbekende bron" -%}
-                      | <strong>Auteur:</strong> {{ item.creator | join: ", " }}
-                    {%- endif -%}
-                    <br>
-                    <strong>Publicatiedatum:</strong> {{ item.pubDate | date: "%d-%m-%Y %H:%M" }}
-                  </p>
-                  <p>{{ item.description }}</p>
-                </div>
-              </li>
-            {%- endfor -%}
-          </ul>
-        {%- else -%}
-          <p>Er worden momenteel geen nieuwsberichten gevonden. De data wordt elke dag bijgewerkt.</p>
-        {%- endif -%}
+          <ul id="news-list"></ul>
       </div>
     
     </div>
 
-    <script src="/assets/js/newsdashboard.js" defer></script>
+    <script src="assets/js/newsdashboard.js" defer></script>
 
 </body>
 </html>
