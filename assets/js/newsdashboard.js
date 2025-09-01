@@ -5,14 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const counter = document.getElementById('article-counter');
     const filterContainer = document.getElementById('filter-container');
 
-    // Functie om de nieuwsdata op te halen
     async function fetchNews() {
         try {
-            const response = await fetch('/_data/news.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            // De data is een geneste array [[...]], dus we pakken de eerste entry.
+            // GECORRIGEERD PAD: Haal data op uit de publieke 'data' map.
+            // Een relatief pad is het meest robuust.
+            const response = await fetch('data/news.json'); 
+            
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
             const data = await response.json();
             const articles = data[0];
             
@@ -29,9 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Functie om de artikelen op de pagina te tonen
+    // ... de rest van je JavaScript-code blijft ongewijzigd ...
+    
     function renderArticles(articles) {
-        newsList.innerHTML = ''; // Maak de lijst leeg
+        newsList.innerHTML = '';
         articles.forEach(item => {
             const listItem = document.createElement('li');
             listItem.className = 'news-item';
@@ -61,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Functie om de filterknoppen te genereren
     function renderFilterButtons(articles) {
         const sources = [...new Set(articles.map(item => item.source_id))];
         sources.sort().forEach(source => {
@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Functie om alle event listeners op te zetten nadat de content geladen is
     function setupEventListeners() {
         const filterButtons = document.querySelectorAll('.filter-btn');
         filterButtons.forEach(button => {
@@ -144,6 +143,5 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${day}-${month}-${year} ${hours}:${minutes}`;
     }
 
-    // Start de applicatie
     fetchNews();
 });
