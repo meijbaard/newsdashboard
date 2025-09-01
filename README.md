@@ -4,7 +4,7 @@ Welkom bij het Persoonlijk Nieuws Dashboard! Dit project is ontworpen om automat
 
 De perfecte tool om op de hoogte te blijven van je online aanwezigheid!
 
-[Link naar de live demo-pagina](https://meijbaard.github.io/newsdashboard/)
+[Link naar de live demo-pagina](https://markeijbaard.nl/inhetnieuws/)
 
 ---
 
@@ -35,9 +35,8 @@ Volg deze stappen om je eigen nieuwsdashboard op te zetten in een nieuwe GitHub 
 Omdat Google Nieuws geen directe RSS-links meer aanbiedt, gebruiken we de gratis dienst [RSS.app](https://rss.app/) om een stabiele JSON-feed te genereren.
 
 1.  **Formuleer je zoekopdracht**: Ga naar [Google Nieuws](https://news.google.com) en gebruik de geavanceerde zoekfunctie (tandwiel-icoon) om een precieze zoekopdracht te maken. Een goed voorbeeld is:
-    * **"Met alle woorden"**: `Eijbaard (site:ad.nl OR site:rtvutrecht.nl OR site:gooieneemlander.nl)`
-    * **"Met een van deze woorden"**: `Mark Wethouder`
-    * **"Zonder de woorden"**: `Wouter`
+    * **"Met alle woorden"**: `NAAM (site:ad.nl OR site:rtvutrecht.nl OR site:gooieneemlander.nl)`
+    * **"Met een van deze woorden"**: `WOORD ANDERWOORD`
 
 2.  **Kopieer de URL**: Voer de zoekopdracht uit en kopieer de volledige URL uit de adresbalk van je browser.
 
