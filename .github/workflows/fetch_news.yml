@@ -1,9 +1,8 @@
-# .github/workflows/fetch_news.yml
 name: Fetch Daily News
 
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 */4 * * *'   # elke 4 uur
   workflow_dispatch:
 
 jobs:
@@ -20,24 +19,28 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Fetch, merge, and sort news
+      - name: Fetch and process news
         run: |
+          set -euo pipefail
           mkdir -p _data
-          # Stap 1: Haal nieuwe artikelen op. Pakt alleen .results als het een array is, anders wordt het een lege array [].
-          curl "https://newsdata.io/api/1/news?apikey=${{ secrets.NEWSDATA_API_KEY }}&q=Mark%20Eijbaard&language=nl" | jq 'if (.results | type) == "array" then .results else [] end' > new_articles.json
 
-          # Stap 2: Controleer of de (nu veilige) lijst met nieuwe artikelen items bevat.
-          if jq -e 'length > 0' new_articles.json > /dev/null; then
-            echo "Nieuwe artikelen gevonden. Bezig met samenvoegen."
-            # Stap 3a: Als er al een nieuwsbestand bestaat, voeg ze samen en behoud de geneste structuur [[...]]
-            if [ -f "_data/news.json" ]; then
-              jq -s '[ (.[0][0] + .[1] | unique_by(.link) | sort_by(.pubDate) | reverse) ]' _data/news.json new_articles.json > temp_news.json && mv temp_news.json _data/news.json
-            # Stap 3b: Anders, maak een nieuw bestand aan met de juiste geneste structuur [[...]]
-            else
-              jq '[ . | sort_by(.pubDate) | reverse ]' new_articles.json > _data/news.json
-            fi
-          else
-            echo "Geen nieuwe artikelen gevonden of API gaf een fout. Er worden geen wijzigingen gemaakt."
+          curl -L -s "${{ secrets.RSS_FEED_URL }}" -o new_articles_raw.json
+
+          jq '[ (.items? // .entries? // .articles? // .data? // []) | .[]
+              | {
+                  title: (.title // ""),
+                  link: (.url // .id // ""),
+                  pubDate: (.date_published // ""),
+                  description: (.content_text // .content_html // .summary // .description // ""),
+                  source_id: ((.authors[0].name // "") | select(. != "") // (.link // "" | capture("https?://(?<domain>[^/]+)/") | .domain // "Onbekende bron")),
+                  image_url: (.image // ""),
+                  creator: [ (.authors[0].name // "") ]
+                }
+              | select([.title, .description] | map((. // "") | test("Eijbaard"; "i")) | any)
+          ]' new_articles_raw.json > new_articles.json
+
+          if [ $(jq 'length' new_articles.json) -gt 0 ]; then
+            node .github/scripts/merge_news.js _data/news.json new_articles.json
           fi
       
       - name: Commit and push if there are changes
@@ -45,6 +48,5 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add _data/news.json
-          # Commit alleen als er wijzigingen zijn
           git diff --staged --quiet || git commit -m "Update daily news"
           git push
