@@ -1,18 +1,21 @@
 # 📰 Persoonlijk Nieuws Dashboard
 
-Welkom bij het Persoonlijk Nieuws Dashboard! Dit project is ontworpen om automatisch het internet af te zoeken naar nieuwsartikelen waarin een specifieke naam (in dit geval "Mark Eijbaard") voorkomt. Het verzamelt deze artikelen, voegt ze toe aan een groeiend archief en presenteert ze op een schone, filterbare webpagina die wordt gehost via GitHub Pages.
+Welkom bij het Persoonlijk Nieuws Dashboard! Dit project is ontworpen om automatisch nieuwsartikelen te verzamelen waarin een specifieke naam voorkomt. De artikelen worden toegevoegd aan een groeiend archief en gepresenteerd op een schone, filterbare webpagina die wordt gehost via GitHub Pages.
 
 De perfecte tool om op de hoogte te blijven van je online aanwezigheid!
+
+[Link naar de live demo-pagina](https://meijbaard.github.io/newsdashboard/)
 
 ---
 
 ## ✨ Kenmerken
 
-* **Automatische Dagelijkse Updates**: Elke ochtend om 07:00 UTC haalt een script automatisch de nieuwste artikelen op.
-* **Groeiend Archief**: Nieuwe artikelen worden toegevoegd aan het bestaande archief, waarbij dubbele items worden verwijderd.
+* **Automatische Updates**: Een script haalt elke vier uur automatisch de nieuwste artikelen op.
+* **Groeiend Archief**: Nieuwe artikelen worden op basis van de titel ontdubbeld en toegevoegd aan het bestaande archief.
+* **Dynamische Interface**: De webpagina laadt de nieuwsberichten dynamisch in met JavaScript.
+* **Filterbaar**: Filter de nieuwsberichten eenvoudig per nieuwsbron met interactieve knoppen.
 * **Visueel Aantrekkelijk**: Artikelen worden getoond met afbeelding, titel, bron, auteur en beschrijving.
-* **Filterbaar**: Filter de nieuwsberichten eenvoudig per nieuwsbron met handige knoppen.
-* **Nieuwe Berichten Gemarkeerd**: Artikelen van de laatste 24 uur krijgen een "✨ Nieuw" label.
+* **"Nieuw" Label**: Artikelen van de laatste 25 uur krijgen een speciaal "✨ Nieuw" label.
 * **Volledig Gratis Hosting**: Draait volledig op de gratis diensten van GitHub (Actions & Pages).
 
 ---
@@ -23,95 +26,42 @@ Volg deze stappen om je eigen nieuwsdashboard op te zetten in een nieuwe GitHub 
 
 ### **Stap 1: Repository Opzetten**
 
-1.  Maak een nieuwe **publieke** repository aan op GitHub. De naam moet eindigen op `.github.io` als je het als je hoofdwebsite wilt gebruiken (bijv. `jouwgebruikersnaam.github.io`), of geef het een andere naam (bijv. `nieuws-dashboard`) voor een projectwebsite.
-2.  Kloon de repository naar je computer (of gebruik GitHub Desktop).
+1.  Maak een nieuwe **publieke** repository aan op GitHub (bijv. `nieuws-dashboard`).
+2.  Kloon de repository naar je computer.
+3.  Zorg ervoor dat alle bestanden uit deze repository (`index.html`, `assets/`, `data/`, `.github/`) in je nieuwe repository staan.
 
-### **Stap 2: Bestanden Toevoegen** 📂
+### **Stap 2: De Nieuwsbron Instellen (Google Nieuws & RSS.app)**
 
-Zorg ervoor dat de volgende bestanden met de juiste inhoud en op de juiste locatie in je repository staan.
+Omdat Google Nieuws geen directe RSS-links meer aanbiedt, gebruiken we de gratis dienst [RSS.app](https://rss.app/) om een stabiele JSON-feed te genereren.
 
-* **In de hoofdmap (`/`)**:
-    * `newsdashboard.md`: De hoofdpagina die de nieuwsberichten toont.
-    * `Gemfile`: Definieert de software die nodig is om de site te bouwen.
-* **In de `_data` map (`/_data/`)**:
-    * `news.json`: Het databestand met je nieuwsarchief. Begin met een leeg bestand `[]` of een voorbeeldbestand om de structuur te zien.
-* **In de `.github/workflows` map (`/.github/workflows/`)**:
-    * `fetch_news.yml`: De workflow die dagelijks nieuws ophaalt.
-    * `build-jekyll.yml`: De workflow die de website bouwt en publiceert.
+1.  **Formuleer je zoekopdracht**: Ga naar [Google Nieuws](https://news.google.com) en gebruik de geavanceerde zoekfunctie (tandwiel-icoon) om een precieze zoekopdracht te maken. Een goed voorbeeld is:
+    * **"Met alle woorden"**: `Eijbaard (site:ad.nl OR site:rtvutrecht.nl OR site:gooieneemlander.nl)`
+    * **"Met een van deze woorden"**: `Mark Wethouder`
+    * **"Zonder de woorden"**: `Wouter`
 
-### **Stap 3: API Sleutel Instellen** 🔑
+2.  **Kopieer de URL**: Voer de zoekopdracht uit en kopieer de volledige URL uit de adresbalk van je browser.
 
-De workflow heeft een API-sleutel van [newsdata.io](https://newsdata.io/) nodig. Deze slaan we veilig op.
+3.  **Genereer de Feed**:
+    * Ga naar [RSS.app](https://rss.app/) en maak een gratis account.
+    * Plak je Google Nieuws-URL in het daarvoor bestemde veld en klik op "Generate".
+    * RSS.app genereert nu een feed. Klik op de feed en zoek de optie om de **JSON-feed URL** te krijgen. Deze ziet er ongeveer zo uit: `https://rss.app/feeds/v1.1/jouw_unieke_code.json`.
 
-1.  Ga naar je GitHub repository en klik op **Settings**.
-2.  Navigeer naar **Secrets and variables** > **Actions**.
-3.  Klik op de knop **New repository secret**.
-4.  **Naam:** `NEWSDATA_API_KEY`
-5.  **Value:** Plak hier je API-sleutel van newsdata.io.
-6.  Klik op **Add secret**.
+### **Stap 3: Sla de Feed-URL Veilig Op**
 
-### **Stap 4: GitHub Pages Activeren** 🌐
+1.  Ga in je GitHub repository naar **Settings > Secrets and variables > Actions**.
+2.  Klik op de knop **New repository secret**.
+3.  **Naam:** `RSS_FEED_URL`
+4.  **Value:** Plak hier de **JSON-feed-URL** die je van RSS.app hebt gekregen.
+5.  Klik op **Add secret**.
 
-We vertellen GitHub dat het de site moet publiceren via onze build-workflow.
+### **Stap 4: GitHub Pages Activeren**
 
-1.  Ga opnieuw naar **Settings** in je repository.
-2.  Kies in het linkermenu voor **Pages**.
-3.  Onder "Build and deployment", bij "Source", selecteer **GitHub Actions**.
+1.  Ga in je repository naar **Settings > Pages**.
+2.  Onder "Build and deployment", selecteer bij "Source" de optie **GitHub Actions**. GitHub zal automatisch de `pages.yml` workflow gebruiken om de site te publiceren.
 
-### **Stap 5: Testen & Live Gaan** ✅
+### **Stap 5: Live Gaan**
 
-1.  Commit en push alle bestanden naar je GitHub repository.
-2.  Ga naar het **Actions** tabblad. Je zult zien dat de `Build and Deploy` workflow start.
-3.  Start de `Fetch Daily News` workflow handmatig door erop te klikken en de "Run workflow" knop te gebruiken.
-4.  Wacht tot beide workflows succesvol zijn afgerond (groene vinkjes).
-5.  Je site is nu live! De URL vind je terug onder **Settings** > **Pages**.
-
----
-
-## 🗂️ Handleiding: Initieel Archief Aanmaken
-
-Om te starten met een gevuld dashboard, is een initieel archief van oudere artikelen verzameld. Hieronder de methode die daarvoor is gebruikt.
-
-### **Doel van de Dataverzameling**
-
-Het doel was om gestructureerde data te verzamelen van verschillende online nieuwsbronnen. Deze data, opgeslagen in CSV-formaat, is samengevoegd tot het `news.json`-bestand dat als startpunt voor het dashboard dient.
-
-### **Gebruikte Databronnen** 🖥️
-
-De data is verzameld van de volgende websites:
-
-* AD.nl
-* RTV Utrecht
-* Gooi- en Eemlander
-* Baarnsche Courant
-
-### **Methode**
-
-De dataverzameling is uitgevoerd via een semi-automatische aanpak, nadat een volledig geautomatiseerde script-gebaseerde methode te complex en onbetrouwbaar bleek.
-
-#### **1. Oorspronkelijke Aanpak (Python Script)** 🐍
-
-In eerste instantie is geprobeerd om een script in Python te ontwikkelen met `requests`, `BeautifulSoup` en `Selenium`. Deze aanpak stuitte op significante obstakels:
-
-* **Dynamische Content**: Veel websites laden hun zoekresultaten met JavaScript, waardoor simpele scrapers niet effectief waren.
-* **Anti-Scraping Maatregelen**: De websites detecteerden en blokkeerden geautomatiseerde browsers (zoals `Selenium`), zelfs met tools als `undetected-chromedriver`.
-* **Technische Complexiteit**: Het proces vereiste het oplossen van besturingssysteem-specifieke permissies (macOS) en compatibiliteitsproblemen met Python-versies.
-
-#### **2. Definitieve Aanpak (Web Scraper Extensie)** 🖱️
-
-Vanwege de bovenstaande uitdagingen is gekozen voor een robuustere methode: de **[Web Scraper](https://chromewebstore.google.com/detail/web-scraper-free-web-scra/jnhgnonknehpejjnehehllkliplmbmhn?hl=nl)** browserextensie voor Chrome.
-
-Deze no-code tool omzeilt anti-scraping maatregelen doordat de gebruiker zelf de pagina laadt in een normale browsersessie.
-
-De workflow was als volgt:
-
-1.  **Installatie**: De Web Scraper extensie is toegevoegd aan Google Chrome.
-2.  **Navigatie**: Handmatig navigeren naar de zoekresultatenpagina van elke nieuwsbron.
-3.  **Sitemap Creatie**: Voor elke website is een 'sitemap' (een schraap-plan) aangemaakt.
-4.  **Selectors Definiëren**: Met de point-and-click interface van de tool zijn de data-elementen (titel, link, beschrijving, etc.) geselecteerd.
-5.  **Data Scrapen**: Het schraap-plan is uitgevoerd.
-6.  **Exporteren**: De verzamelde data is geëxporteerd naar een `.csv`-bestand.
-
-### **Volgende Stappen**
-
-De verzamelde `.csv`-bestanden zijn opgeschoond (o.a. ontdubbeld) en samengevoegd tot het `_data/news.json` bestand in deze repository. Dit vormt de basis van het archief.
+1.  Commit en push alle bestanden naar je `main` branch.
+2.  Ga naar het **Actions** tabblad in je repository. Je zult zien dat de `Deploy NewsDashboard` workflow start om je site te publiceren.
+3.  Je kunt de `Fetch Daily News` workflow handmatig starten om direct de eerste artikelen op te halen.
+4.  Je site is nu live! De URL vind je terug onder **Settings > Pages**.
