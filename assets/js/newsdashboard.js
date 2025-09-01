@@ -7,14 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchNews() {
         try {
-            // GECORRIGEERD PAD: Haal data op uit de publieke 'data' map.
-            // Een relatief pad is het meest robuust.
             const response = await fetch('data/news.json'); 
-            
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
-            const data = await response.json();
-            const articles = data[0];
+            // --- GECORRIGEERD ---
+            // Lees de platte array direct in, in plaats van een geneste array te verwachten.
+            const articles = await response.json();
             
             if (articles && articles.length > 0) {
                 renderArticles(articles);
@@ -29,8 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ... de rest van je JavaScript-code blijft ongewijzigd ...
-    
     function renderArticles(articles) {
         newsList.innerHTML = '';
         articles.forEach(item => {
@@ -119,28 +115,36 @@ document.addEventListener('DOMContentLoaded', function() {
         newsItems.forEach(item => {
             const pubDateString = item.dataset.pubdate;
             if (pubDateString) {
-                const pubDate = new Date(pubDateString.replace(" ", "T") + "Z");
-                if (pubDate > twentyFiveHoursAgo) {
-                    if (item.querySelector('.new-badge')) return;
-                    
-                    const newBadge = document.createElement('span');
-                    newBadge.textContent = '✨ Nieuw';
-                    newBadge.className = 'new-badge';
-                    newBadge.style.cssText = 'background-color: #28a745; color: white; padding: 3px 8px; margin-left: 10px; border-radius: 5px; font-size: 0.8em; font-weight: bold;';
-                    item.querySelector('h3').appendChild(newBadge);
-                }
+                try {
+                    const pubDate = new Date(pubDateString.replace(" ", "T"));
+                    if (!isNaN(pubDate) && pubDate > twentyFiveHoursAgo) {
+                        if (item.querySelector('.new-badge')) return;
+                        
+                        const newBadge = document.createElement('span');
+                        newBadge.textContent = '✨ Nieuw';
+                        newBadge.className = 'new-badge';
+                        newBadge.style.cssText = 'background-color: #28a745; color: white; padding: 3px 8px; margin-left: 10px; border-radius: 5px; font-size: 0.8em; font-weight: bold;';
+                        item.querySelector('h3').appendChild(newBadge);
+                    }
+                } catch(e) { /* Negeer ongeldige datums */ }
             }
         });
     }
     
     function formatDate(dateString) {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${day}-${month}-${year} ${hours}:${minutes}`;
+        if (!dateString) return 'Geen datum';
+        try {
+            const date = new Date(dateString.replace(" ", "T"));
+            if (isNaN(date)) return 'Ongeldige datum';
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}-${month}-${year} ${hours}:${minutes}`;
+        } catch(e) {
+            return 'Ongeldige datum';
+        }
     }
 
     fetchNews();
