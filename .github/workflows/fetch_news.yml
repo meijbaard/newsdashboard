@@ -60,9 +60,10 @@ jobs:
           git push
 
       - name: Trigger deploy newsdashboard
-        uses: peter-evans/workflow-dispatch@v1
+        uses: peter-evans/workflow-dispatch@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: meijbaard/newsdashboard
           workflow: Deploy NewsDashboard.yml
           ref: main
+
