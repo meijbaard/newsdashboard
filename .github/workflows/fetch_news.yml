@@ -23,7 +23,7 @@ jobs:
       - name: Fetch and process news
         run: |
           set -e
-          mkdir -p _data
+          mkdir -p data
 
           echo "=== Stap 1: Download feed ==="
           curl -L -s "${{ secrets.RSS_FEED_URL }}" -o new_articles_raw.json
