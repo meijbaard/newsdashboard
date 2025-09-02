@@ -1,36 +1,36 @@
-#!/usr/bin/env node
-const fs = require('fs');
+const fs = require("fs");
 
 const [existingFile, newFile] = process.argv.slice(2);
 
 if (!existingFile || !newFile) {
-  console.error("Gebruik: merge_news.js <bestaand.json> <nieuw.json>");
+  console.error("Usage: node merge_news.js <existing.json> <new.json>");
   process.exit(1);
 }
 
+// Lees bestaande artikelen
 let existing = [];
-let incoming = [];
-
-try {
-  existing = JSON.parse(fs.readFileSync(existingFile, 'utf8'));
-} catch {
-  existing = [];
+if (fs.existsSync(existingFile)) {
+  existing = JSON.parse(fs.readFileSync(existingFile, "utf-8"));
 }
 
-try {
-  incoming = JSON.parse(fs.readFileSync(newFile, 'utf8'));
-} catch {
-  incoming = [];
-}
+// Lees nieuwe artikelen
+const incoming = JSON.parse(fs.readFileSync(newFile, "utf-8"));
 
-// Voeg alleen nieuwe artikelen toe op basis van titel
-const titles = new Set(existing.map(a => a.title));
-const uniqueNew = incoming.filter(a => !titles.has(a.title));
+// Voeg nieuwe artikelen toe, voorkom dubbele titels
+const combined = [...existing];
 
-const merged = [...existing, ...uniqueNew];
+incoming.forEach((item) => {
+  // Dubbele titel check
+  if (!combined.some((e) => e.title === item.title)) {
+    // source_id primair link
+    item.source_id = item.link || item.source_id || "Onbekende bron";
+    combined.push(item);
+  }
+});
 
-// Logging gecommentarieerd zodat news.json veilig blijft
-// console.log("✅ Merge voltooid: " + uniqueNew.length + " nieuw, totaal " + merged.length + " artikelen");
-// console.log(JSON.stringify(merged, null, 2));
+// Sorteer op datum, nieuwste eerst
+combined.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-fs.writeFileSync('temp_news.json', JSON.stringify(merged, null, 2));
+// Schrijf terug
+fs.writeFileSync(existingFile, JSON.stringify(combined, null, 2));
+console.log(`Merged ${incoming.length} articles into ${existingFile}`);
