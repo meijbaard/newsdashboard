@@ -1,1 +1,24 @@
-✅ Merge voltooid: 19 nieuw, totaal 19 artikelen
+[
+	{
+		"title": "Nieuw Park Geopend in Baarn",
+		"link": "https://www.voorbeeld.nl/nieuws/nieuw-park-geopend",
+		"pubDate": "2025-08-15 11:00:00",
+		"source_id": "Baarnsche Courant",
+		"description": "Wethouder Mark Eijbaard heeft vanochtend feestelijk het nieuwe 'Oranjepark' geopend. Het park bevat speeltoestellen en een vijver.",
+		"creator": [
+			"Jan Jansen"
+		],
+		"image_url": "https://via.placeholder.com/150/28a745/FFFFFF?text=Park"
+	},
+	{
+		"title": "Verkeersplan voor Centrum Nader Bekeken",
+		"link": "https://www.ad.nl/regio/verkeersplan-centrum",
+		"pubDate": "2025-08-14 16:30:00",
+		"source_id": "AD.nl",
+		"description": "Naar aanleiding van vragen uit de gemeenteraad zal wethouder Eijbaard het nieuwe verkeersplan voor het centrum van Baarn opnieuw evalueren.",
+		"creator": [
+			"Eva de Wit"
+		],
+		"image_url": "https://via.placeholder.com/150/007bff/FFFFFF?text=Verkeer"
+	}
+]
