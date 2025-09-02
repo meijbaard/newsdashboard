@@ -31,5 +31,5 @@ const uniqueNew = incoming.filter(a => !existingTitles.has(a.title));
 
 const merged = [...existing, ...uniqueNew];
 
-console.log(`✅ Merge voltooid: ${uniqueNew.length} nieuw, totaal ${merged.length} artikelen`);
-console.log(JSON.stringify(merged, null, 2));
+#console.log(`✅ Merge voltooid: ${uniqueNew.length} nieuw, totaal ${merged.length} artikelen`);
+#console.log(JSON.stringify(merged, null, 2));
