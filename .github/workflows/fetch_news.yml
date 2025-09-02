@@ -51,7 +51,7 @@ jobs:
             mv temp_news.json _data/news.json
             echo "Samenvoegen gelukt."
           else
-            echo "Geen artikelen gevonden."
+            echo "Geen nieuwe artikelen gevonden."
           fi
       
       - name: Commit and push if there are changes
