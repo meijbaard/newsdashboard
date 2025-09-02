@@ -59,11 +59,11 @@ jobs:
           git diff --staged --quiet || git commit -m "Update news"
           git push
 
-      - name: Trigger deploy newsdashboard
-        uses: peter-evans/workflow-dispatch@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: meijbaard/newsdashboard
-          workflow: Deploy NewsDashboard.yml
-          ref: main
+       - name: Trigger deploy workflow
+         run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type":"deploy-newsdashboard"}'
 
