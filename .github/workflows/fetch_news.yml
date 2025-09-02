@@ -47,8 +47,8 @@ jobs:
 
           echo "=== Stap 3: Merge met bestaand archief ==="
           if jq -e 'length > 0' new_articles.json > /dev/null; then
-            node .github/scripts/merge_news.js _data/news.json new_articles.json > temp_news.json
-            mv temp_news.json _data/news.json
+            node .github/scripts/merge_news.js data/news.json new_articles.json > temp_news.json
+            mv temp_news.json data/news.json
             echo "Samenvoegen gelukt."
           else
             echo "Geen nieuwe artikelen gevonden."
