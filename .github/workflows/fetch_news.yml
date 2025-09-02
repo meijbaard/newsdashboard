@@ -23,10 +23,12 @@ jobs:
       - name: Fetch and process news
         run: |
           set -e
+          
+          # Zorg dat de data map bestaat
           mkdir -p data
 
           echo "=== Stap 1: Download feed ==="
-          curl -L -s "${{ secrets.RSS_FEED_URL }}" -o new_articles_raw.json
+          curl -L -s "${{ secrets.RSS_FEED_URL }}" -o data/new_articles_raw.json
 
           echo "=== Stap 2: Bouw new_articles.json ==="
           jq '[ (.items? // .entries? // .articles? // .data? // []) | .[]
@@ -43,21 +45,8 @@ jobs:
                     image_url: (.image // ""),
                     creator: [ (.authors[0].name // "") ]
                   }
-              ]' new_articles_raw.json > new_articles.json
+              ]' data/new_articles_raw.json > data/new_articles.json
 
           echo "=== Stap 3: Merge met bestaand archief ==="
-          if jq -e 'length > 0' new_articles.json > /dev/null; then
-            node .github/scripts/merge_news.js data/news.json new_articles.json > temp_news.json
-            mv temp_news.json data/news.json
-            echo "Samenvoegen gelukt."
-          else
-            echo "Geen nieuwe artikelen gevonden."
-          fi
-      
-      - name: Commit and push if there are changes
-        run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/news.json
-          git diff --staged --quiet || git commit -m "Update news"
-          git push
+          if jq -e 'length > 0' data/new_articles.json > /dev/null; then
+            node .github/scripts/merge_news.js data/news.json data/new_articles.json > tem
