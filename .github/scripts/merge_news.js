@@ -1,43 +1,41 @@
-// .github/scripts/merge_news.js
-const fs = require("fs");
+// merge_news.js
+const fs = require('fs');
+const path = require('path');
 
-const existingFile = "data/news.json";
-const newFile = "new_articles.json";
+const newsPath = path.join(__dirname, '../data/news.json');          // bestaand archief
+const newArticlesPath = path.join(__dirname, '../data/new_articles.json'); // nieuwe feed
 
-// === Stap 1: Lees bestaande artikelen ===
-let existing = [];
-if (fs.existsSync(existingFile)) {
-  const content = fs.readFileSync(existingFile, "utf8").trim();
-  if (content.length > 0) {
-    try {
-      existing = JSON.parse(content);
-    } catch (e) {
-      console.error("⚠️ Waarschuwing: kon bestaande JSON niet parsen. Begin met lege array.");
-      existing = [];
-    }
-  }
-}
-
-// === Stap 2: Lees nieuwe artikelen ===
-let incoming = [];
+// Stap 1: lees bestaande artikelen
+let existingArticles = [];
 try {
-  incoming = JSON.parse(fs.readFileSync(newFile, "utf8"));
-} catch (e) {
-  console.error("❌ Fout: kon nieuwe artikelen niet parsen:", e);
-  process.exit(1);
+    const data = fs.readFileSync(newsPath, 'utf8');
+    existingArticles = JSON.parse(data);
+} catch (err) {
+    console.warn('⚠️ Bestaande news.json niet te parsen. Begin met lege array.');
 }
 
-// === Stap 3: Merge, voorkom dubbele titels ===
-const seenTitles = new Set(existing.map(a => a.title));
-const merged = [...existing];
-
-for (const article of incoming) {
-  if (!seenTitles.has(article.title)) {
-    merged.push(article);
-    seenTitles.add(article.title);
-  }
+// Stap 2: lees nieuwe artikelen
+let newArticles = [];
+try {
+    const data = fs.readFileSync(newArticlesPath, 'utf8');
+    newArticles = JSON.parse(data);
+} catch (err) {
+    console.error('❌ Kan new_articles.json niet lezen of parsen:', err.message);
+    process.exit(1);
 }
 
-// === Stap 4: Schrijf resultaat terug ===
-fs.writeFileSync(existingFile, JSON.stringify(merged, null, 2));
-console.log(`✅ Merge voltooid: ${incoming.length} nieuw, totaal ${merged.length} artikelen`);
+// Stap 3: voeg alleen artikelen toe waarvan de titel nog niet bestaat
+const existingTitles = new Set(existingArticles.map(a => a.title));
+const articlesToAdd = newArticles.filter(a => !existingTitles.has(a.title));
+
+// Stap 4: combineer
+const combined = [...existingArticles, ...articlesToAdd];
+
+// Stap 5: schrijf terug naar news.json
+try {
+    fs.writeFileSync(newsPath, JSON.stringify(combined, null, 2), 'utf8');
+    console.log(`✅ Merge voltooid: ${articlesToAdd.length} nieuw, totaal ${combined.length} artikelen`);
+} catch (err) {
+    console.error('❌ Fout bij schrijven naar news.json:', err.message);
+    process.exit(1);
+}
