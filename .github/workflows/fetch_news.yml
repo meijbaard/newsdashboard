@@ -35,21 +35,18 @@ jobs:
                     link: (.url // .id // ""),
                     pubDate: (.date_published // .pubDate // ""),
                     description: (.content_text // .content_html // .summary // .description // ""),
-                    source_id: ((.authors[0].name // "") 
-                                | select(. != "") 
-                                // (.link // "" | capture("https?://(?<domain>[^/]+)/") | .domain // "Onbekende bron")),
+                    source_id: ((.authors[0].name // "") | select(. != "") // ((.link // "" | capture("https?://(?<domain>[^/]+)/") | .domain) // "Onbekende bron")),
                     image_url: (.image // ""),
                     creator: [ (.authors[0].name // "") ]
                   }
               ]' data/new_articles_raw.json > data/new_articles.json
 
           echo "=== Stap 3: Merge met bestaand archief ==="
-          if [ $(jq 'length' data/new_articles.json) -gt 0 ]; then
-            node .github/scripts/merge_news.js data/news.json data/new_articles.json > data/temp_news.json
-            mv data/temp_news.json data/news.json
-            echo "Samenvoegen gelukt."
+          if [ -f data/news.json ] && jq -e 'length > 0' data/news.json > /dev/null; then
+            node .github/scripts/merge_news.js data/news.json data/new_articles.json > temp_news.json
+            mv temp_news.json data/news.json
           else
-            echo "Geen nieuwe artikelen gevonden."
+            cp data/new_articles.json data/news.json
           fi
 
       - name: Commit and push if there are changes
