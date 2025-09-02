@@ -3,55 +3,45 @@ name: Fetch News
 on:
   schedule:
     - cron: '0 * * * *' # elk uur
-  workflow_dispatch:     # handmatig starten
+  workflow_dispatch:
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
-  fetch-and-merge:
+  fetch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+      - name: Setup
+        run: mkdir -p data
 
       - name: Download feed
         run: |
-          set -euo pipefail
-          echo "=== Stap 1: Download feed ==="
-          mkdir -p data
-          curl -L -s "https://rss.app/feeds/v1.1/1qgUrTtzlV1LBB2g.json" -o new_articles_raw.json
+          curl -L -s "${{ secrets.RSS_FEED_URL }}" -o new_articles_raw.json
 
       - name: Build new_articles.json
         run: |
-          echo "=== Stap 2: Bouw new_articles.json ==="
-          jq '[ .items[] 
-                | {
-                    title: (.title // ""),
-                    link: (.url // .id // ""),
-                    pubDate: (.date_published // ""),
-                    description: (.content_text // .summary // .content_html // ""),
-                    source_id: (
-                      (.url | capture("https?://(?<domain>[^/]+)/") | .domain)
-                      // (.authors[0].name // "Onbekende bron")
-                    ),
-                    image_url: (.image // .attachments[0].url // ""),
-                    creator: [ (.authors[0].name // "") ]
-                  }
-              ]' new_articles_raw.json > new_articles.json
+          jq '[ (.items? // .entries? // .articles? // []) | .[]
+              | {
+                  title: (.title // ""),
+                  link: (.url // .id // ""),
+                  pubDate: (.date_published // ""),
+                  description: (.content_text // .content_html // .summary // .description // ""),
+                  source_id: (
+                    (.link // .url // "" | capture("https?://(?<domain>[^/]+)/") | .domain)
+                    // (.authors[0].name // "Onbekende bron")
+                  ),
+                  image_url: (.image // ""),
+                  creator: [ (.authors[0].name // "") ]
+                }
+          ]' new_articles_raw.json > new_articles.json
 
-      - name: Merge with existing news.json
-        run: |
-          echo "=== Stap 3: Merge met bestaand archief ==="
-          node .github/scripts/merge_news.js data/news.json new_articles.json
+      - name: Merge with archive
+        run: node .github/scripts/merge_news.js data/news.json new_articles.json
 
-      - name: Commit & push
+      - name: Commit updates
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -59,11 +49,10 @@ jobs:
           git diff --staged --quiet || git commit -m "Update news"
           git push
 
-       - name: Trigger deploy workflow
-         run: |
+      - name: Trigger deploy workflow
+        run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/dispatches \
             -d '{"event_type":"deploy-newsdashboard"}'
-
