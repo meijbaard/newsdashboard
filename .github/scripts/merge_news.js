@@ -1,43 +1,36 @@
 #!/usr/bin/env node
+const fs = require('fs');
 
-const fs = require("fs");
+const [existingFile, newFile] = process.argv.slice(2);
 
-const args = process.argv.slice(2);
-if (args.length < 2) {
-  console.error("Gebruik: merge_news.js <bestand_news.json> <bestand_new_articles.json>");
+if (!existingFile || !newFile) {
+  console.error("Gebruik: merge_news.js <bestaand.json> <nieuw.json>");
   process.exit(1);
 }
-
-const existingFile = args[0];
-const newFile = args[1];
 
 let existing = [];
 let incoming = [];
 
 try {
-  const data = fs.readFileSync(existingFile, "utf-8");
-  existing = JSON.parse(data);
-} catch (err) {
-  console.warn("⚠️ Bestaande news.json niet te parsen. Begin met lege array.");
+  existing = JSON.parse(fs.readFileSync(existingFile, 'utf8'));
+} catch {
+  existing = [];
 }
 
 try {
-  const data = fs.readFileSync(newFile, "utf-8");
-  incoming = JSON.parse(data);
-} catch (err) {
-  console.error(`❌ Kan ${newFile} niet lezen of parsen: ${err.message}`);
-  process.exit(1);
+  incoming = JSON.parse(fs.readFileSync(newFile, 'utf8'));
+} catch {
+  incoming = [];
 }
 
-// Voeg alleen artikelen toe met unieke titel
-const existingTitles = existing.map(function(a) { return a.title; });
-const uniqueNew = incoming.filter(function(a) {
-  return existingTitles.indexOf(a.title) === -1;
-});
+// Voeg alleen nieuwe artikelen toe op basis van titel
+const titles = new Set(existing.map(a => a.title));
+const uniqueNew = incoming.filter(a => !titles.has(a.title));
 
-const merged = existing.concat(uniqueNew);
+const merged = [...existing, ...uniqueNew];
 
+// Logging gecommentarieerd zodat news.json veilig blijft
 // console.log("✅ Merge voltooid: " + uniqueNew.length + " nieuw, totaal " + merged.length + " artikelen");
 // console.log(JSON.stringify(merged, null, 2));
 
-fs.writeFileSync(existingFile, JSON.stringify(merged, null, 2), "utf-8");
+fs.writeFileSync('temp_news.json', JSON.stringify(merged, null, 2));
