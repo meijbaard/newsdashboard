@@ -2,11 +2,11 @@ name: Fetch News
 
 on:
   schedule:
-    - cron: "0 * * * *"  # elk uur
+    - cron: "0 8 * * *"  # Elke ochtend om 08:00 UTC
   workflow_dispatch:
 
 permissions:
-  contents: write  # om data/news.json te committen
+  contents: write
 
 jobs:
   fetch:
@@ -19,24 +19,13 @@ jobs:
         with:
           node-version: 20
 
-      - name: Download feed
-        run: |
-          mkdir -p data
-          curl -sL "${{ secrets.RSS_FEED_URL }}" -o new_articles_raw.json
+      - name: Install dependencies
+        run: npm install fast-xml-parser
 
-      - name: Build new_articles.json
-        run: |
-          jq '[ (.items? // .entries? // []) | .[]
-            | {
-                title: (.title // ""),
-                link: (.url // .id // ""),
-                pubDate: (.date_published // ""),
-                description: (.content_text // .content_html // .summary // .description // ""),
-                source_id: (.url // ""),      # primary is link
-                image_url: (.image // ""),
-                creator: [ (.authors[0].name // "") ]
-              }
-          ]' new_articles_raw.json > new_articles.json
+      - name: Fetch and Convert Google News
+        env:
+          RSS_FEED_URL: ${{ secrets.RSS_FEED_URL }}
+        run: node .github/scripts/fetch_rss.js
 
       - name: Merge with existing news
         run: node .github/scripts/merge_news.js data/news.json new_articles.json
@@ -46,7 +35,7 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/news.json
-          git diff --staged --quiet || git commit -m "Update news"
+          git diff --staged --quiet || git commit -m "Update news via Google News RSS"
           git push
 
       - name: Trigger deploy workflow
