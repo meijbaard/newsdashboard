@@ -1,3 +1,6 @@
+---
+layout: null
+---
 <!doctype html>
 <html lang="nl">
 <head>
@@ -8,25 +11,79 @@
 </head>
 <body>
 
-    <div class="content-wrapper">
+<div class="content-wrapper">
+
+  <h1>:newspaper: [HIER JE NAAM] in het nieuws</h1>
+
+  <div class="news-controls">
+    <p id="article-counter">Totaal {{ site.data.news.size | default: 0 }} artikelen gevonden.</p>
     
-      <h1>[HIER JE NAAM] in het nieuws</h1>
-    
-      <div class="news-controls">
-        <p id="article-counter">Artikelen aan het laden...</p>
-        <div id="filter-container">
-          <strong>Filter op bron:</strong><br>
-          <button class="filter-btn active" data-source="all">Alles tonen</button>
-        </div>
-      </div>
-    
-      <div id="nieuws-dashboard">
-          <ul id="news-list"></ul>
-      </div>
-    
+    <div id="filter-container">
+      <strong>Filter op bron:</strong><br>
+      <button class="filter-btn active" data-source="all">Alles tonen</button>
+      
+      {% assign sources = site.data.news | map: "source_id" | compact | uniq | sort %}
+      {% for source in sources %}
+        {% if source != "" and source != "Onbekende bron" %}
+          <button class="filter-btn" data-source="{{ source }}">{{ source }}</button>
+        {% endif %}
+      {% endfor %}
     </div>
+  </div>
 
-    <script src="assets/js/newsdashboard.js" defer></script>
+  <div id="nieuws-dashboard">
+    {%- if site.data.news and site.data.news.size > 0 -%}
+      <ul id="news-list">
+        {%- for item in site.data.news -%}
+          <li class="news-item" data-pubdate="{{ item.pubDate | default: '' }}" data-source="{{ item.source_id | default: 'Onbekende bron' }}">
+            
+            {%- assign img = item.image_url | default: '' -%}
+            {%- if img != "" -%}
+              <img src="{{ img }}" alt="Beeld bij artikel" class="news-image" loading="lazy">
+            {%- endif -%}
 
+            <div class="news-content">
+              <h3>
+                <a href="{{ item.link | default: '#' }}" target="_blank" rel="noopener noreferrer">
+                  {{ item.title | default: 'Zonder titel' }}
+                </a>
+              </h3>
+              <p>
+                <strong>Bron:</strong> {{ item.source_id | default: 'Onbekende bron' }} 
+                
+                {%- assign creator_size = item.creator | compact | size | default: 0 -%}
+                {%- if creator_size > 0 -%}
+                  | <strong>Auteur:</strong> {{ item.creator | join: ", " }}
+                {%- endif -%}
+                <br>
+                <strong>Publicatiedatum:</strong> 
+                {%- if item.pubDate and item.pubDate != "" -%}
+                  {{ item.pubDate | date: "%d-%m-%Y %H:%M" }}
+                {%- else -%}
+                  Onbekend
+                {%- endif -%}
+              </p>
+              <p>{{ item.description | default: '' }}</p>
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p>Er worden momenteel geen nieuwsberichten gevonden. Zorg dat de GitHub Action is ingesteld en heeft gedraaid.</p>
+    {%- endif -%}
+  </div>
+
+  <div class="rss-button-container">
+    <a href="{{ site.baseurl }}/feed.xml" class="rss-button" target="_blank">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-rss-fill" viewBox="0 0 16 16">
+        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1-1-1zm0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1-1-1zm.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+      </svg>
+      RSS Feed
+    </a>
+  </div>
+
+</div>
+
+<script src="assets/js/newsdashboard.js" defer></script>
 </body>
 </html>
