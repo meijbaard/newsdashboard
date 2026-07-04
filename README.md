@@ -1,35 +1,73 @@
-# Personal News Dashboard
+# 📰 Persoonlijk Nieuws Dashboard
 
-Een geautomatiseerd, gratis en onafhankelijk nieuwsdashboard voor publieke figuren, politici en organisaties. Dit project haalt lokaal en landelijk nieuws over jou op, ontdubbelt het, verwijdert 'lelijke' data en presenteert het in een strak filterbaar overzicht. 
+Dit project verzamelt automatisch nieuwsartikelen waarin een specifieke naam voorkomt en presenteert ze op een filterbare, doorzoekbare webpagina via GitHub Pages.
 
-Er zijn geen betaalde diensten of servers nodig; alles draait lokaal via GitHub Actions en Jekyll.
+[Link naar de live demo-pagina](https://markeijbaard.nl/inhetnieuws/)
 
-## Hoe werkt het?
-1. **Hybride Ophaalsysteem:** Het script (`update_news.js`) haalt periodiek nieuws op via directe RSS-feeds van lokale kranten (voor de hoogste kwaliteit). 
-2. **Google Vangnet:** Als vangnet leest het script ook een Google Nieuws RSS-zoekopdracht uit (voor landelijke titels).
-3. **Validatie:** Het script ontdubbelt artikelen, herstelt ongeldige karakters en slaat alles veilig op in `_data/news.json`.
-4. **Jekyll:** De front-end gebruikt Liquid-tags om de data pijlsnel in te laden.
+---
 
-## Installatie in 5 minuten
+## ✨ Kenmerken
 
-### Stap 1: Repository Klokken
-Fork of kloon deze repository naar je eigen GitHub account. Zorg dat in je repo (onder *Settings > Pages*) is geselecteerd dat de site gebouwd wordt via **GitHub Actions**.
+* **Twee-laags naamfilter**: een artikel komt er alleen in als de naam aantoonbaar voorkomt — in de titel/beschrijving (laag 1) óf in de artikelpagina zelf (laag 2, met cache). Niets glipt erdoorheen.
+* **Poortwachter in CI**: elke workflow-run valideert het volledige archief (schema, datums, duplicaten, naamvermelding). Faalt de validatie, dan wordt er niets gepubliceerd.
+* **Robuust**: per-feed fouttolerantie, timeout + retry, veiligheidsstop tegen onbedoeld krimpend archief.
+* **Automatische updates**: elke 4 uur via GitHub Actions.
+* **Moderne interface**: card grid met zoekveld, filter op bron én jaar, "Nieuw"-badges en "toon meer"-paginering.
+* **XSS-veilig**: alle feeddata wordt als tekst gerenderd, nooit als HTML.
+* **Volledig gratis**: draait op GitHub Actions & Pages.
 
-### Stap 2: Lokale Bronnen Instellen
-Open het bestand `.github/scripts/update_news.js` en pas bovenaan het instellingenblok aan:
-* Wijzig `searchRegex` naar jouw naam (bijv. `/Jan Jansen/i`).
-* Vul in de array `directFeeds` de directe RSS-links in van jouw belangrijkste lokale media.
+---
 
-### Stap 3: Google Nieuws URL Genereren (Het vangnet)
-1. Ga naar [Google Nieuws](https://news.google.com).
-2. Zoek naar jouw naam (bijv. `"Jan Jansen"` of specifieker: `"Jan Jansen" site:ad.nl`).
-3. Kopieer de URL uit je adresbalk (bevat `/search?`).
-4. Verander `/search?` in de URL naar `/rss/search?`.
-5. Ga in je GitHub repo naar **Settings > Secrets and variables > Actions**.
-6. Maak een nieuwe secret aan genaamd `RSS_FEED_URL` en plak daar je nieuwe RSS-link in.
+## 🏗️ Architectuur
 
-### Stap 4: Personaliseer de HTML
-Open `index.html` en vervang de tekst `[HIER JE NAAM]` door jouw eigen naam of de naam van je project.
+```
+config.json                      ← zoektermen, feeds, bestandspaden
+.github/scripts/newslib.js       ← gedeelde kernbibliotheek
+.github/scripts/update_news.js   ← elke 4 uur: ophalen + filteren + mergen
+.github/scripts/validate_news.js ← poortwachter: valideert vóór publicatie
+.github/scripts/clean_archive.js ← eenmalige (her)sanering van het archief
+data/news.json                   ← het gevalideerde archief
+data/bodycheck_cache.json        ← cache van pagina-controles
+data/review_articles.json        ← niet-verifieerbare artikelen (paywall)
+```
 
-### Stap 5: Activeer het Dashboard
-Ga in je repository naar het tabblad **Actions**. Selecteer links "Fetch Daily News" en klik op **Run workflow**. Je archief begint zich nu automatisch te vullen met kogelvrije data en zal vanaf nu elke 4 uur worden bijgewerkt!
+Elk artikel in `data/news.json` heeft een `match`-veld dat de bewijsvoering vastlegt:
+`meta` (naam in titel/beschrijving), `body` (naam in artikelpagina), `query` (afkomstig uit een Google Nieuws-zoekopdracht op de naam), of `archive` (handmatig goedgekeurd).
+
+---
+
+## 🚀 Installatie & Configuratie
+
+### Stap 1: Repository opzetten
+
+1. Maak een nieuwe **publieke** repository aan en zet alle bestanden erin.
+2. Pas `config.json` aan: je eigen `searchTerms` en eventueel andere `directFeeds`.
+3. Vervang `[HIER JE NAAM]` in `index.html`.
+
+### Stap 2: Google Nieuws-zoekfeed (optioneel vangnet)
+
+1. Maak via [RSS.app](https://rss.app/) of een vergelijkbare dienst een RSS-feed van een Google Nieuws-zoekopdracht **op je naam**.
+2. Voeg de feed-URL toe als repository secret: **Settings > Secrets and variables > Actions**, naam `RSS_FEED_URL`.
+3. Belangrijk: de zoekopdracht moet je naam bevatten. Alleen dan mag de pipeline niet-verifieerbare artikelen uit deze feed vertrouwen (`match: "query"`).
+
+### Stap 3: GitHub Pages activeren
+
+1. Ga naar **Settings > Pages** en kies bij "Source" de optie **GitHub Actions**.
+
+### Stap 4: Live gaan
+
+1. Push alles naar `main`.
+2. Start de **Fetch News** workflow handmatig via het Actions-tabblad voor de eerste artikelen.
+
+---
+
+## 🧹 Archief opnieuw saneren
+
+Draai lokaal (Node 20+):
+
+```bash
+npm install fast-xml-parser
+node .github/scripts/clean_archive.js
+```
+
+Elk artikel wordt getoetst op naamvermelding. Verwijderde artikelen komen in `data/removed_articles.json`, niet-verifieerbare (paywall) in `data/review_articles.json`. Review-items die je wilt behouden zet je terug in `data/news.json` met `"match": "archive"`.

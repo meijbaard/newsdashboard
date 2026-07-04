@@ -1,0 +1,15 @@
+{
+  "searchTerms": ["Eijbaard"],
+  "dataFile": "data/news.json",
+  "cacheFile": "data/bodycheck_cache.json",
+  "reviewFile": "data/review_articles.json",
+  "googleFeedEnv": "RSS_FEED_URL",
+  "googleFeedIsNameQuery": true,
+  "maxBodyChecksPerRun": 40,
+  "directFeeds": [
+    { "url": "https://www.rtvutrecht.nl/rss/nieuws.xml", "source_id": "rtvutrecht.nl" },
+    { "url": "https://www.eemland1.nl/rss", "source_id": "eemland1.nl" },
+    { "url": "https://www.baarnschecourant.nl/rss", "source_id": "baarnschecourant.nl" },
+    { "url": "https://www.gooieneemlander.nl/rss/", "source_id": "gooieneemlander.nl" }
+  ]
+}

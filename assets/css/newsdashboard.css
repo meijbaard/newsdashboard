@@ -1,63 +1,416 @@
-/* assets/css/newsdashboard.css */
+/* ================================================================
+   IN HET NIEUWS — card grid
+   ================================================================ */
 
 .content-wrapper {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* ================================================================
+   PAGINAKOP
+   ================================================================ */
+
+.news-page-header {
+  background: linear-gradient(135deg, #0d1928 0%, #123152 100%);
+  color: white;
+  padding: 2.8rem 2.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.news-page-header h1 {
+  color: white !important;
+  margin: 0 0 0.4rem;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+}
+
+.news-page-header p {
+  color: rgba(255, 255, 255, 0.68);
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
+.news-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.6rem;
+  margin-top: 1.2rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.news-hero-stats strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* ================================================================
+   FILTERBALK
+   ================================================================ */
+
 .news-controls {
-  margin-bottom: 2em;
-  padding-bottom: 1em;
-  border-bottom: 1px solid #eee;
+  background: #f5f7fa;
+  border: 1px solid #e8edf3;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.news-controls-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.news-search-wrap {
+  position: relative;
+  flex: 1 1 260px;
+}
+
+.news-search-wrap svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+#news-search {
+  width: 100%;
+  padding: 9px 14px 9px 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  font-size: 0.88rem;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+#news-search:focus {
+  border-color: #004a8f;
+  box-shadow: 0 0 0 3px rgba(0, 74, 143, 0.12);
+}
+
+#year-filter {
+  padding: 9px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #475569;
+  background: #ffffff;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+
+#year-filter:focus {
+  border-color: #004a8f;
+  box-shadow: 0 0 0 3px rgba(0, 74, 143, 0.12);
+}
+
+#article-counter {
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0.9rem 0 0;
+  font-size: 0.92rem;
+}
+
+#filter-container strong {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .filter-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  padding: 8px 15px;
-  margin-right: 8px;
-  margin-bottom: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 5px 14px;
+  margin-right: 6px;
+  margin-bottom: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  transition: all 0.15s ease;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
 }
 
 .filter-btn:hover {
-  background-color: #ddd;
+  background: #eff6ff;
+  border-color: #004a8f;
+  color: #004a8f;
 }
 
 .filter-btn.active {
-  background-color: #007bff;
+  background: #004a8f;
   color: white;
-  border-color: #007bff;
+  border-color: #004a8f;
 }
 
-.news-item {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 2em;
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.news-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  margin-right: 20px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.news-content {
-  flex: 1;
-}
-
-.news-content h3 {
-  margin-top: 0;
-}
+/* ================================================================
+   NIEUWS CARD GRID
+   ================================================================ */
 
 ul#news-list {
   padding-left: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.4rem;
+  list-style: none;
 }
+
+.news-item {
+  list-style: none;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8edf3;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.11);
+  border-color: #c8d6e8;
+}
+
+/* Media bovenaan de kaart, met nette fallback zonder afbeelding */
+.news-media {
+  position: relative;
+  height: 170px;
+  flex-shrink: 0;
+  background: #eef2f7;
+}
+
+.news-media .news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+  display: block;
+}
+
+.news-media--fallback {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 74, 143, 0.18), transparent 55%),
+    radial-gradient(circle at 85% 75%, rgba(232, 98, 10, 0.12), transparent 50%),
+    linear-gradient(135deg, #0d1928 0%, #1b3a5e 100%);
+}
+
+.news-media--fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' fill='rgba(255,255,255,0.28)' viewBox='0 0 16 16'%3E%3Cpath d='M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5v-11zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5H12z'/%3E%3Cpath d='M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.news-source-tag {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  background: rgba(13, 25, 40, 0.82);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+}
+
+/* Inhoud */
+.news-content {
+  padding: 1.1rem 1.25rem 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.news-content h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+}
+
+.news-content h3 a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.news-content h3 a:hover {
+  color: #004a8f;
+}
+
+.news-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-meta {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  margin: auto 0 0;
+  line-height: 1.5;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.news-meta-sep {
+  margin: 0 4px;
+}
+
+/* Nieuw badge */
+.new-badge {
+  background: #e8620a;
+  color: white;
+  padding: 2px 8px;
+  margin-left: 8px;
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   LEGE STAAT & TOON MEER
+   ================================================================ */
+
+#news-empty {
+  text-align: center;
+  color: #64748b;
+  padding: 3rem 1rem;
+  font-size: 0.95rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #004a8f;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+}
+
+.load-more-container {
+  text-align: center;
+  margin-top: 2.2rem;
+}
+
+.load-more-btn {
+  background: #ffffff;
+  border: 1px solid #004a8f;
+  color: #004a8f;
+  border-radius: 22px;
+  padding: 10px 28px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  transition: all 0.18s ease;
+}
+
+.load-more-btn:hover {
+  background: #004a8f;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.load-more-btn[hidden] {
+  display: none;
+}
+
+/* ================================================================
+   RSS KNOP
+   ================================================================ */
+
+.rss-button-container {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e8edf3;
+}
+
+.rss-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  background: #e8620a;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.87rem;
+  transition: background 0.2s, transform 0.15s;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+}
+
+.rss-button:hover {
+  background: #cc5409;
+  transform: translateY(-2px);
+  color: white;
+}
+
+.rss-button svg { margin-right: 8px; }
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+
+@media (max-width: 640px) {
+  ul#news-list { grid-template-columns: 1fr; }
+
+  .news-page-header { padding: 1.8rem 1.5rem; }
+
+  .news-page-header h1 { font-size: 1.5rem; }
+
+  .news-controls { padding: 1rem; }
+
+  .news-controls-row { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-item, .filter-btn, .load-more-btn, .rss-button { transition: none; }
+  .news-item:hover { transform: none; }
+}
+body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #fafbfd; margin: 0; color: #0f172a; }
