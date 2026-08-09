@@ -271,7 +271,13 @@ async function bodyCheck(url, regex, cache) {
       const text = html
         .replace(/<script[\s\S]*?<\/script>/gi, " ")
         .replace(/<style[\s\S]*?<\/style>/gi, " ");
-      if (regex.test(text)) {
+      // Linkteksten weg vóór het matchen. Nieuwssites hangen om elk artikel
+      // blokken met 'meest gelezen' en 'gerelateerd'; die teasers linken naar
+      // ándere artikelen. Zonder deze stap matcht elk artikel van een lokale
+      // krant zodra de naam ergens in zo'n teaser staat. De naam in de eigen
+      // lopende tekst is geen link en blijft dus gewoon staan.
+      const body = text.replace(/<a\b[^>]*>[\s\S]*?<\/a>/gi, " ");
+      if (regex.test(body)) {
         result = "match";
       } else if (looksLikeConsentWall(text)) {
         result = "unverifiable"; // paywall/cookiemuur: geen oordeel mogelijk

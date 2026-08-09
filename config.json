@@ -5,8 +5,10 @@
   "reviewFile": "data/review_articles.json",
   "googleFeedEnv": "RSS_FEED_URL",
   "googleFeedIsNameQuery": true,
-  "maxBodyChecksPerRun": 40,
+  "maxBodyChecksPerRun": 70,
   "directFeeds": [
+    { "url": "https://www.dewoudenberger.nl/rss", "source_id": "dewoudenberger.nl" },
+    { "url": "https://xon.nu/feed/", "source_id": "xon.nu" },
     { "url": "https://www.rtvutrecht.nl/rss/nieuws.xml", "source_id": "rtvutrecht.nl" },
     { "url": "https://www.eemland1.nl/rss", "source_id": "eemland1.nl" },
     { "url": "https://www.baarnschecourant.nl/rss", "source_id": "baarnschecourant.nl" },

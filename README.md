@@ -61,6 +61,27 @@ Elk artikel in `data/news.json` heeft een `match`-veld dat de bewijsvoering vast
 
 ---
 
+## ➕ Een nieuwsbron toevoegen
+
+Een bron is niets meer dan een RSS- of Atom-feed. Er is geen scraping en geen bron-specifieke code: voeg een regel toe aan `directFeeds` in `config.json` en klaar.
+
+```json
+{ "url": "https://www.dewoudenberger.nl/rss", "source_id": "dewoudenberger.nl" }
+```
+
+- **`url`** — de feed-URL. Redirects worden gevolgd, dus zowel `/rss` als `/feed/` werkt meestal.
+- **`source_id`** — wordt letterlijk gebruikt als label op de filterknop en op de kaart. De knoppen worden uit de data afgeleid, dus je hoeft aan de frontend niets te wijzigen.
+
+Drie dingen om rekening mee te houden:
+
+1. **De volgorde bepaalt wie een gedeeld verhaal krijgt.** Ontdubbelen gebeurt op titel over álle bronnen heen (`getDedupKey`), en de eerste feed in de array wint. Zet de bron die je bij een gedeeld bericht wilt zien dus bovenaan.
+2. **`maxBodyChecksPerRun` is een gedeeld budget.** Artikelen zonder de naam in titel of samenvatting worden op paginaniveau gecontroleerd, en dat budget wordt in feed-volgorde opgemaakt. Voeg je feeds toe, verhoog dit dan mee — anders krijgt de Google-zoekfeed (die als laatste komt) geen beurt meer. De uitkomsten worden per URL gecached, dus de druk is vooral hoog in de eerste paar runs.
+3. **Feeds zonder afbeeldingen zijn prima.** Levert een feed geen `enclosure`/`media:content`, dan valt de kaart terug op de fallback-stijl.
+
+Test een nieuwe bron eerst zonder het archief te raken: maak een kopie van `config.json` waarin `dataFile`, `cacheFile` en `reviewFile` naar een tijdelijke map wijzen, en draai `NEWS_CONFIG=<kopie> node .github/scripts/update_news.js`.
+
+---
+
 ## 🧹 Archief opnieuw saneren
 
 Draai lokaal (Node 20+):
