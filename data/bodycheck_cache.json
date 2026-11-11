@@ -14934,5 +14934,33 @@
  "https://www.rtvutrecht.nl/nieuws/4113567/van-high-tea-tot-cadeaubon-verschillen-in-de-waardering-van-mantelzorgers": {
   "result": "nomatch",
   "checkedAt": "2026-11-11T03:52:37.861Z"
+ },
+ "https://www.dewoudenberger.nl/lokaal/religie/1326583/de-maranathakerk-met-een-flinke-uitbreiding-heropend": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:31.073Z"
+ },
+ "https://www.dewoudenberger.nl/lokaal/politiek/1325714/woudenberg-maakt-plannen-voor-aardgasvrije-wijken": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:31.235Z"
+ },
+ "https://www.rtvutrecht.nl/nieuws/4116648/honderden-klanten-geld-kwijt-door-faillissement-ontharingskliniek": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:33.350Z"
+ },
+ "https://www.rtvutrecht.nl/nieuws/4116617/112-nieuws-vrouw-op-driewieler-te-water-in-overvecht-treinverkeer-plat-marteling-in-flat-utrecht": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:33.760Z"
+ },
+ "https://www.rtvutrecht.nl/nieuws/4113667/net-geopend-kankerinloophuis-in-utrecht-verliest-subsidie-totale-verbijstering": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:34.160Z"
+ },
+ "https://www.rtvutrecht.nl/nieuws/4115470/gedoe-in-baarn-over-pietenpakken-en-pepernotenkanon": {
+  "result": "match",
+  "checkedAt": "2026-11-11T11:35:34.581Z"
+ },
+ "https://www.rtvutrecht.nl/nieuws/4115254/minister-sterk-over-misstanden-bij-zorginstelling-tamarinde-het-raakt-mij": {
+  "result": "nomatch",
+  "checkedAt": "2026-11-11T11:35:35.257Z"
  }
 }
